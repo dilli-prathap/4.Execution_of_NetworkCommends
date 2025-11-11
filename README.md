@@ -26,7 +26,50 @@ This commands includes
 • Other IP Commands e.g. show ip route etc.
 <BR>
 
+## PROGREAM
+## CLIENT:
+``` PYTHON
+import socket
+
+s = socket.socket()
+s.connect(('localhost', 8000))
+
+while True:
+    ip = input("Enter the website you want to ping (or type 'exit' to quit): ")
+    s.send(ip.encode('utf-8'))
+    if ip.lower() == 'exit':
+        break
+    print(s.recv(4096).decode('utf-8'))
+
+s.close()
+```
+## SERVER:
+```PYTHON
+import socket
+from pythonping import ping
+
+s = socket.socket()
+s.bind(('localhost', 8000))
+s.listen(5)
+print("Server listening on port 8000...")
+c, addr = s.accept()
+print(f"Connection from {addr}")
+
+while True:
+    try:
+        hostname = c.recv(1024).decode('utf-8')
+        if not hostname or hostname.lower() == 'exit':
+            print("Client disconnected.")
+            break
+        response = ping(hostname, verbose=False, count=4)
+        c.send(str(response).encode('utf-8'))
+    except Exception as e:
+        c.send(f"Ping failed: {e}".encode('utf-8'))
+
+c.close()
+```
 ## Output
+<img width="1105" height="367" alt="512489419-652e0c15-8059-46a8-80d1-1ddc6a3c946d" src="https://github.com/user-attachments/assets/33a8924d-0064-4765-bb1e-5fc0b1ed9984" />
 
 ## Result
 Thus Execution of Network commands Performed 
